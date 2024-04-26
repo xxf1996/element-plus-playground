@@ -66,14 +66,14 @@ const dark = useDark()
 // persist state
 watchEffect(() => history.replaceState({}, '', `#${store.serialize()}`))
 
-const refreshPreview = () => {
-  replRef.value?.reload()
-}
+// const refreshPreview = () => {
+//   replRef.value?.reload()
+// }
 </script>
 
 <template>
   <div v-if="!loading" antialiased>
-    <Header :store="store" @refresh="refreshPreview" />
+    <!-- <Header :store="store" @refresh="refreshPreview" /> -->
     <Repl
       ref="replRef"
       :theme="dark ? 'dark' : 'light'"
@@ -102,6 +102,14 @@ body {
 
 .vue-repl {
   height: calc(100vh - var(--nav-height)) !important;
+}
+
+.vue-repl .left {
+  width: 0 !important;
+}
+
+.vue-repl .right {
+  width: 100% !important;
 }
 
 .dark .vue-repl,

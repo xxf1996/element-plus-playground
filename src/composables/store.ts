@@ -39,7 +39,7 @@ export const useStore = (initial: Initial) => {
         vue: 'latest',
         elementPlus: 'latest',
         typescript: 'latest',
-      } satisfies Versions)
+      } satisfies Versions),
   )
 
   const compiler = shallowRef<typeof import('vue/compiler-sfc')>()
@@ -68,7 +68,7 @@ export const useStore = (initial: Initial) => {
   })
 
   const bultinImportMap = computed<ImportMap>(() =>
-    genImportMap(versions, nightly.value)
+    genImportMap(versions, nightly.value),
   )
   const userImportMap = computed<ImportMap>(() => {
     const code = state.files[IMPORT_MAP]?.code.trim()
@@ -82,7 +82,7 @@ export const useStore = (initial: Initial) => {
     return map
   })
   const importMap = computed<ImportMap>(() =>
-    mergeImportMap(bultinImportMap.value, userImportMap.value)
+    mergeImportMap(bultinImportMap.value, userImportMap.value),
   )
 
   // eslint-disable-next-line no-console
@@ -101,6 +101,7 @@ export const useStore = (initial: Initial) => {
     renameFile,
     getTsConfig,
     reloadLanguageTools: undefined,
+    customElement: '',
   })
 
   watch(
@@ -109,12 +110,12 @@ export const useStore = (initial: Initial) => {
       const file = new File(
         ELEMENT_PLUS_FILE,
         generateElementPlusCode(version, userOptions.value.styleSource).trim(),
-        hideFile.value
+        hideFile.value,
       )
       state.files[ELEMENT_PLUS_FILE] = file
       compileFile(store, file).then((errs) => (state.errors = errs))
     },
-    { immediate: true }
+    { immediate: true },
   )
 
   function generateElementPlusCode(version: string, styleSource?: string) {
@@ -123,11 +124,11 @@ export const useStore = (initial: Initial) => {
       : genCdnLink(
           nightly.value ? '@element-plus/nightly' : 'element-plus',
           version,
-          '/dist/index.css'
+          '/dist/index.css',
         )
     const darkStyle = style.replace(
       '/dist/index.css',
-      '/theme-chalk/dark/css-vars.css'
+      '/theme-chalk/dark/css-vars.css',
     )
     return elementPlusCode
       .replace('#STYLE#', style)
@@ -158,7 +159,9 @@ export const useStore = (initial: Initial) => {
     }
 
     watchEffect(() =>
-      compileFile(store, state.activeFile).then((errs) => (state.errors = errs))
+      compileFile(store, state.activeFile).then(
+        (errs) => (state.errors = errs),
+      ),
     )
 
     watch(
@@ -169,7 +172,7 @@ export const useStore = (initial: Initial) => {
         state.dependencyVersion,
       ],
       useDebounceFn(() => store.reloadLanguageTools?.(), 300),
-      { deep: true }
+      { deep: true },
     )
 
     inited = true
@@ -196,6 +199,7 @@ export const useStore = (initial: Initial) => {
 
   function initFiles(serializedState: string) {
     const files: StoreState['files'] = {}
+    const search = new URLSearchParams(location.search)
     if (serializedState) {
       const saved = deserialize(serializedState)
       for (let [filename, file] of Object.entries(saved)) {
@@ -212,6 +216,14 @@ export const useStore = (initial: Initial) => {
         files[filename] = new File(filename, file as string)
       }
       userOptions.value = saved._o || {}
+    } else if (search.get('code')) {
+      const code = decodeURIComponent(search.get('code') ?? '')
+      files[APP_FILE] = new File(APP_FILE, code)
+      const map = search.get('map')
+      if (map) {
+        const pkgs = decodeURIComponent(map)
+        files[IMPORT_MAP] = new File(IMPORT_MAP, pkgs)
+      }
     } else {
       files[APP_FILE] = new File(APP_FILE, welcomeCode)
     }
@@ -219,7 +231,7 @@ export const useStore = (initial: Initial) => {
     if (!files[IMPORT_MAP]) {
       files[IMPORT_MAP] = new File(
         IMPORT_MAP,
-        JSON.stringify({ imports: {} }, undefined, 2)
+        JSON.stringify({ imports: {} }, undefined, 2),
       )
     }
     if (!files[TSCONFIG]) {
@@ -292,7 +304,7 @@ export const useStore = (initial: Initial) => {
       ].includes(filename)
     ) {
       ElMessage.warning(
-        'You cannot remove it, because Element Plus requires it.'
+        'You cannot remove it, because Element Plus requires it.',
       )
       return
     }
@@ -304,7 +316,7 @@ export const useStore = (initial: Initial) => {
           title: 'Delete File',
           type: 'warning',
           center: true,
-        }
+        },
       )
     ) {
       if (state.activeFile.filename === filename) {

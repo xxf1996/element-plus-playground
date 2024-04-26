@@ -1,5 +1,6 @@
 {
   "editor.formatOnSave": true,
   "iconify.includes": ["ep"],
-  "eslint.experimental.useFlatConfig": true
+  "eslint.experimental.useFlatConfig": true,
+  "typescript.tsdk": "node_modules\\typescript\\lib"
 }
